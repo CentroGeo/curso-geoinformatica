@@ -21,7 +21,7 @@
 				zoom: 12
 			});
 			// Credit where credit is due
-			var attribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+			var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
 			
 			
 			// This allows concurrent calls (faster tile loading)
@@ -30,19 +30,19 @@
 			// Settings common to all tiles we'll be using
 			var tile_settings = {
 				maxZoom: 21,
-				attribution: attribution,
+				attribution: osmAttrib,
 				subdomains: subdomains
 			};
 
 			// All three Stamen map tile layers
 			var toner = 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png';
-			var water = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png';
 			var osm = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+			var water = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png';
 
 			// Create a 'list' of tile layer objects	
 			tiles = {
-				"OSM": new L.TileLayer(osm, tile_settings),
 				"Toner": new L.TileLayer(toner, tile_settings),
+				"OSM": new L.TileLayer(osm, tile_settings),
 				"Watercolor": new L.TileLayer(water, tile_settings)
 			}
 
