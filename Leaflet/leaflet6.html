@@ -1,0 +1,175 @@
+<html>
+<head>
+	<title>Leaflet template</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<style>		
+		body {
+			padding: 0;
+			margin: 0;
+		}
+
+		html,
+		body,
+		#mapDiv {
+			height: 100%;
+		}
+
+		.legend {
+			color: #555;
+		}
+
+		.legend ul {
+			padding: 0px;
+			margin: 0px;
+		}
+
+		.legend i {
+			width: 18px;
+			height: 18px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+
+		.legend li {
+			height: 18px;
+			list-style: none;
+		}
+
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255, 255, 255, 1);
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			border-radius: 5px;
+		}
+
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+		
+	</style>
+</head>
+<body>
+	<div id="mapDiv"></div>
+	<script>
+		// When the webpage is ready (loaded)
+		var map;
+		$(document).ready(function() {
+			map = new L.Map('mapDiv',{
+				center:[19.41, -99.11],
+				zoom: 12
+			});
+			// Credit where credit is due
+			var attribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+			
+			
+			// This allows concurrent calls (faster tile loading)
+			var subdomains = ['a', 'b', 'c'];
+			
+			// Settings common to all tiles we'll be using
+			var tile_settings = {
+				maxZoom: 21,
+				attribution: attribution,
+				subdomains: subdomains
+			};
+
+			// All three Stamen map tile layers
+			var toner = 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png';
+			var water = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png';
+			var osm = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+			// Create a 'list' of tile layer objects	
+			tiles = {
+				"OSM": new L.TileLayer(osm, tile_settings),
+				"Toner": new L.TileLayer(toner, tile_settings),
+				"Watercolor": new L.TileLayer(water, tile_settings)
+			}
+
+			// Add first layer to the map
+			map.addLayer(tiles["Toner"]);
+			
+			// And create a 'control' to toggle between layers
+			//L.control.layers(tiles).addTo(map);
+			
+			// AJAX call to load the GeoJSON data
+			$.getJSON("delegaciones.geojson", function(data) {
+				// When geojson is loaded...
+				var geojson = new L.GeoJSON(data, {style: style,
+				onEachFeature: onEachFeature});
+				map.addLayer(geojson);
+				
+				// Modify layer control to include the newest one
+				var overlays = {
+					"Delegaciones": geojson
+				}
+				// And create a 'control' to toggle between layers
+				L.control.layers(tiles, overlays).addTo(map);
+			});
+			
+			var popup = L.popup();
+
+			function onEachFeature(feature, layer) {
+				layer.on({click: onMapClick})
+			}
+
+			function onMapClick(e) {
+				var name = e.target.feature.properties.NOMBRE;
+				popup
+					.setLatLng(e.latlng)
+					.setContent("Delegaci&oacute;n. " + name)
+					.openOn(map);
+			};
+		
+			function getColor(d) {
+				return d <= 467622.80  ? '#e41a1c' :
+					   d <= 804663.60  ? '#377eb8' :
+					   d <= 1141704.40 ? '#4daf4a' :
+					   d <= 1478745.20 ? '#984ea3' :
+					   d <= 1815786.00 ? '#ff7f00' :
+						 			     '#ffff33';
+			}
+
+			function style(feature) {
+				return {
+					fillColor: getColor(feature.properties.POB1),
+					weight: 2,
+					opacity: 1,
+					color: 'transparent',
+					fillOpacity: 0.7
+				};
+			}
+			
+			// Add a legend
+			var legend = L.control({
+				position: 'bottomleft'
+			});
+
+			legend.onAdd = function(map) {
+
+				var div = L.DomUtil.create('div', 'info legend'),
+					polys = ["467622.80", "804663.60", "1141704.40", "1478745.20", "1815786.00", "X"],
+					labels = [];
+
+				// Loop through our zones and generate a label with a colored
+				// square for each interval
+				var html = '<h4>Poblaci&oacute;n</h4><ul>'
+				for (var i = 0; i < polys.length; i++) {
+					html +=
+						'<li><i style="background:' + getColor(polys[i]) + '"></i> ' +
+						" " + polys[i] + '</li>';
+				}
+				html += '</ul>';
+				div.innerHTML = html;
+				return div;
+			};
+			legend.addTo(map);
+				
+		});
+	</script>
+</body>
+</html>

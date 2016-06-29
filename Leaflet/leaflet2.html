@@ -1,0 +1,57 @@
+<html>
+<head>
+	<title>Leaflet template</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<style>
+		html, body, #mapDiv {
+		height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div id="mapDiv"></div>
+	<script>
+		// When the webpage is ready (loaded)
+		var map;
+		$(document).ready(function() {
+			map = new L.Map('mapDiv',{
+				center:[19.41, -99.11],
+				zoom: 12
+			});
+			// Credit where credit is due
+			var attribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+			
+			// This allows concurrent calls (faster tile loading)
+			var subdomains = ['a', 'b', 'c'];
+			
+			// Settings common to all tiles we'll be using
+			var tile_settings = {
+				maxZoom: 21,
+				attribution: attribution,
+				subdomains: subdomains
+			};
+
+			// All three Stamen map tile layers
+			var toner = 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png';
+			var water = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png';
+			var osm = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+			// Create a 'list' of tile layer objects	
+			tiles = {
+				"OSM": new L.TileLayer(osm, tile_settings),
+				"Toner": new L.TileLayer(toner, tile_settings),
+				"Watercolor": new L.TileLayer(water, tile_settings)
+			}
+
+			// Add first layer to the map
+			map.addLayer(tiles["Toner"]);
+
+			// And create a 'control' to toggle between layers
+			L.control.layers(tiles).addTo(map);
+		
+		});
+	</script>
+</body>
+</html>

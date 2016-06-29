@@ -1,0 +1,44 @@
+<html>
+<head>
+	<title>Leaflet template</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<style>
+		html, body, #mapDiv {
+		height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div id="mapDiv"></div>
+	<script>
+		// When the webpage is ready (loaded)
+		var map;
+		$(document).ready(function() {
+			map = new L.Map('mapDiv',{
+				center:[19.41, -99.11],
+				zoom: 12
+			});
+			// Credit where credit is due
+			var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+			
+			// This allows concurrent calls (faster tile loading)
+			var subdomains = ['a', 'b', 'c'];
+		
+			// Change this url to use different set of map tiles
+			var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+	
+			var osm = new L.TileLayer(osmUrl, {
+				minZoom: 8, 
+				maxZoom: 21, 
+				attribution: osmAttrib,
+				subdomains: subdomains
+			});
+
+			// Add it to the map
+			map.addLayer(osm);
+		});
+	</script>
+</body>
+</html>
